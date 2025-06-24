@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SEO Analyzer Tool</title>
+  <style>
+    body { font-family: Arial; margin: 20px; background: #f4f4f4; }
+    h1 { color: #333; }
+    textarea { width: 100%; height: 200px; padding: 10px; }
+    button { padding: 10px 20px; margin-top: 10px; }
+    .result { background: #fff; padding: 20px; margin-top: 20px; border-radius: 6px; }
+    .ok { color: green; }
+    .warn { color: orange; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>SEO Analyzer Tool</h1>
+  <p>Paste your HTML code below:</p>
+  <textarea id="htmlInput" placeholder="Paste your HTML here..."></textarea>
+  <button onclick="analyzeSEO()">Analyze</button>
+  
+  <div class="result" id="result"></div>
+
+  <script>
+    function analyzeSEO() {
+      const html = document.getElementById('htmlInput').value;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const result = [];
+
+      // Title tag
+      const title = doc.querySelector('title');
+      result.push(`<p><strong>Title:</strong> ${title ? title.textContent : '<span class="error">Missing</span>'}</p>`);
+
+      // Meta Description
+      const metaDesc = doc.querySelector('meta[name="description"]');
+      result.push(`<p><strong>Meta Description:</strong> ${metaDesc ? metaDesc.getAttribute('content') : '<span class="error">Missing</span>'}</p>`);
+
+      // H1 Tag
+      const h1 = doc.querySelector('h1');
+      result.push(`<p><strong>H1 Tag:</strong> ${h1 ? h1.textContent : '<span class="error">Missing</span>'}</p>`);
+
+      // Image ALT tags
+      const images = doc.querySelectorAll('img');
+      let missingAlt = 0;
+      images.forEach(img => {
+        if (!img.alt || img.alt.trim() === '') missingAlt++;
+      });
+      result.push(`<p><strong>Images:</strong> ${images.length} total, <span class="${missingAlt ? 'warn' : 'ok'}">${missingAlt} missing alt</span></p>`);
+
+      // Word Count
+      const bodyText = doc.body.textContent || '';
+      const wordCount = bodyText.trim().split(/\s+/).length;
+      result.push(`<p><strong>Word Count:</strong> ${wordCount}</p>`);
+
+      document.getElementById('result').innerHTML = result.join('');
+    }
+  </script>
+</body>
+</html>
